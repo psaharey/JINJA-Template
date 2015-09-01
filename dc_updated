@@ -1,0 +1,152 @@
+<style>
+.table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {     padding: 0px;
+    line-height: 0.98571;
+    vertical-align: top;
+    border-top: 0px solid #d1d8dd;}
+	
+</style>
+<div class="print-heading" style="border-bottom: 2px solid rgb(49, 49, 49); margin-bottom: 10px; height: 30px;">
+    <h5 style=" float: left;">{{ doc.select_print_heading or "DC PACKING LIST"}}</h5>
+</div>
+<table style="border-collapse: collapse;width: 100%;" border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td class="xl67" style="width: 60%;border-bottom: 1px solid;  border-right: 1px solid;"><strong>SELLER</strong><br>
+<span class="font0">VENDOR NAME &amp; ADDRESS<br>MITTAL CLOTHING PVT LTD<br>NO.240/410/2, (OPP. REDDY SCHOOL)<br>
+NGR LAYOUT -1st CROSS<br>ROOPENA AGRAHARA, BEGUR HOBLI BOMMANAHALLI<br>BANGALORE KARANATAKA<br>PIN CODE: 560068</span>
+</td>
+<td style="width: 40%;border-bottom: 1px solid; ">
+	<table>
+	<tr>
+	    <td class="xl65">INVOICE NUMBER</td>
+		<td class="xl65">{{ doc.name }}</td>
+	</tr>
+	<tr >
+		<td class="xl65">INVOICE DATE</td>
+		<td class="xl65">{{ doc.get_formatted("posting_date") }}</td>
+	</tr>
+	<tr >
+		<td class="xl65" >PO NUMBER</td>
+		<td class="xl65">{{doc.po_no}}</td>
+	</tr>
+	<tr >
+		<td class="xl65" >PO DATE</td>
+		<td class="xl65">{{doc.po_date}}</td>
+	</tr>
+	<tr >
+		<td class="xl65">VENDOR TIN NUMBER</td>
+		<td class="xl65">xxxxxxx</td>
+	</tr>
+	<tr>
+		<td class="xl65">VENDOR CST NUMBER</td>
+		<td class="xl65">xxxxxxx</td>
+	</tr>
+	</table>
+</td>
+</tr>
+<tr>
+<td class="xl67" style="width: 60%;border-bottom: 1px solid;  border-right: 1px solid;"><strong>BUYER</strong><br>
+<span class="font0">BUYER NAME &amp; ADDRESS<br>XXXXX PVT LTD<br>NO.240/410/2, (OPP. REDDY SCHOOL)<br>
+NGR LAYOUT -1st CROSS<br>ROOPENA AGRAHARA, BEGUR HOBLI BOMMANAHALLI</span>
+</td>
+<td style="width: 40%;border-bottom: 1px solid;">
+<table>
+	<tr>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="xl65">BUYER TIN NUMBER</td>
+		<td class="xl65">xxxxxxxx</td>
+	</tr>
+	<tr>
+		<td class="xl65">BUYER CST NUMBER</td>
+		<td class="xl65">xxxxxxxx</td>
+	</tr>
+	
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<table style="width:100%">
+<tbody>
+<tr style="text-align:center; border-bottom: 1px solid;"><td><strong>FORMAT : RETAIL DC</strong></td></tr>
+<tr><td><strong>DC PACK</strong></td></tr>
+</tbody>
+</table>
+<table class="table table-nobordered">
+	<tbody>
+		<tr  style="border-bottom: 1px solid;">
+			<td>CTN No</td>
+            <td>Description</td>
+            <td>Style No</td>
+			<td>Article No</td>
+			<td>Size</td>
+			<td>Color</td>
+			<td>Qty</td>
+			<td>Qty/ CTN</td>
+			<td>TTL. CTN</td>
+			<td>TTL. PCS</td>
+			<td>NET WT</td>
+			<td>GRS WT</td>
+		</tr>
+		{% set count = 0 %}  <!-- set a count variable --->
+		{%- for row in doc.items -%}
+            {% set wt = row.net_wt | float %}
+            {% set qty = row.qty | float %}
+            {% set net_wt = wt*qty %}
+            {% set grs_wt = net_wt+1.4 %}
+			{% set count = count+grs_wt %} <!-- add gross weight to count varaible for each item-->
+		<tr>
+			<td>{{ row.ctn_no }}</td>
+            <td style="width:17%">{{ row.description}}</td>
+            <td>{{ row.style_no}}</td>
+            <td>{{ row.article_no}}</td>
+			<td>{{ row.po_size}}</td>
+            <td>{{ row.po_color}}</td>
+			<td>{{ row.qty }}</td>
+			<td>{{ row.qty }}</td>
+			<td>{{count}}</td>  <!--- testing last updated value of count  :  it's correct here --->
+			<td>{{ row.qty }}</td>
+			<td>{{ net_wt }}</td>
+			<td>{{grs_wt}}</td>
+		{%- endfor -%}
+		<tr  style="border-bottom: 1px solid;">
+			<td colspan="6">TOTAL QTY</td>
+			<td>{{count}}</td>  <!--- out of for loop, count variable is again become zero --->
+			<td>TTL</td>
+			<td>TTL. CTN</td>
+			<td>TTL. PCS</td>
+			<td>NET WT</td>
+			<td>{{count}}</td>
+		</tr>
+	</tbody>
+</table>
+
+			<div class="row">
+				<div class="col-xs-7 text-right"></div>
+				<div class="col-xs-2 text-right"><label>Total</label></div>
+				<div class="col-xs-3 text-right">Rs. {{ doc.total }}</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-5 text-right"></div>
+				<div class="col-xs-5 text-right"><label>CST @2% against C form</label></div>
+				<div class="col-xs-2 text-right">Rs. {{ doc.base_total_taxes_and_charges }}</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-5 text-right"></div>
+				<div class="col-xs-5 text-right"><label>Grand Total</label></div>
+				<div class="col-xs-2 text-right">Rs. {{ doc.grand_total }}</div>
+			</div>
+            
+            <div class="row">
+				<div class="col-xs-5 text-right"></div>
+				<div class="col-xs-5 text-right"><label>Rounded Total</label></div>
+				<div class="col-xs-2 text-right">Rs. {{ doc.rounded_total }}</div>
+			</div>
+            
+            <div class="row" style="border-top: 1px dashed; padding: 8px 0px 5px 0px;">
+				<div class="col-xs-3 text-right"><label>In Words</label></div>
+				<div class="col-xs-9 ">{{ doc.in_words }}</div>
+			</div>
